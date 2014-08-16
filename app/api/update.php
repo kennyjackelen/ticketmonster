@@ -36,7 +36,6 @@ foreach ( $events as $event )
   }
 
   $rightNow = time() * 1000;
-  echo ' got here';
   $cur_low_price = array( $rightNow, $resale_data->summary->minDisplayPrice->amount );
   if ( !is_array( $event->low_price_trend ) ) {
     $event->low_price_trend = array();
