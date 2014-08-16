@@ -70,7 +70,7 @@
 
   function polymerReady() {
 
-    $.getJSON( 'data/events.json', digestEventList );
+    $.getJSON( 'api/get_user_events.php', digestEventList );
 
     _mainDrawerPanel = document.querySelector('#mainDrawerPanel');
     _navDrawer = document.querySelector('#navDrawer');

@@ -2,9 +2,8 @@
 
 include '_common.php';
 
-$file = '../data/events.json';
 $handle = getReadLock();
-$data = file_get_contents( $file );
+$data = file_get_contents( EVENT_FILE );
 releaseReadLock( $handle );
 
 header('Content-Type: application/json');

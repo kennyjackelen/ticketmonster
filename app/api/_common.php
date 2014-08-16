@@ -1,6 +1,6 @@
 <?php
 
-define('EVENT_FILE', '../data/events.json');
+define('EVENT_FILE', '../../data/events.json');
 define('MAX_RETRIES', 5000);
 
 function getTicketmasterCookie() {
