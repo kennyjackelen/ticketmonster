@@ -1,0 +1,23 @@
+body {
+  background: #fafafa;
+  font-family: "RobotoDraft", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #333;
+}
+
+core-toolbar {
+  background: #607d8b;
+}
+
+core-toolbar div {
+  
+  color: #FFFFFF;
+}
+
+.drawer {
+  background: #FFFFFF;
+}
+
+paper-icon-button.widescreen {
+  display: none;
+}
+

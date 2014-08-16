@@ -1,0 +1,67 @@
+[{
+    "event_id": "00004CA5A27CBB03",
+    "name": "Drake vs Lil Wayne",
+    "date": "Tue, Aug 12, 2014 07:00 PM",
+    "venue_name": "Saratoga Performing Arts Center",
+    "venue_city": "Saratoga Springs",
+    "venue_state": "NY",
+    "my_price": 50,
+    "price_data": {
+        "min": 54.15,
+        "first_q": 69.99,
+        "median": 107.88,
+        "third_q": 183.7,
+        "max": 254.7
+    }
+}, {
+    "event_id": "1D004C79F66E9D0D",
+    "name": "Fleetwood Mac: On With The Show",
+    "date": "Tue, Oct 7, 2014 08:00 PM",
+    "venue_name": "Madison Square Garden",
+    "venue_city": "New York",
+    "venue_state": "NY",
+    "my_price": 75,
+    "price_data": {
+        "min": 163.45,
+        "first_q": 238.89,
+        "median": 321.87,
+        "third_q": 412.39,
+        "max": 2379.3
+    }
+}, {
+    "event_id": "02004CAC45ADF196",
+    "name": "Jimmy Buffett & The Coral Reefer Band",
+    "date": "Sat, Aug 30, 2014 06:00 PM",
+    "venue_name": "Hersheypark Stadium",
+    "venue_city": "Hershey",
+    "venue_state": "PA",
+    "my_price": "",
+    "price_data": {
+        "min": 95.7,
+        "first_q": 180.4,
+        "median": 227.57,
+        "third_q": 301.75,
+        "max": 502.92
+    }
+}, {
+    "event_id": "08004CE9D74537F8",
+    "name": "Journey",
+    "date": "Sun, Sep  7, 2014 07:30 PM",
+    "venue_name": "Huntington Center",
+    "venue_city": "Toledo",
+    "venue_state": "OH",
+    "my_price": "",
+    "low_price_trend": [
+        [1408215176000, 88.01]
+    ],
+    "num_ticket_trend": [
+        [1408215176000, 101]
+    ],
+    "price_data": {
+        "min": 88.01,
+        "first_q": 115.68,
+        "median": 182.31,
+        "third_q": 213.74,
+        "max": 276.61
+    }
+}]

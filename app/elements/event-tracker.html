@@ -1,0 +1,180 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<script src="../bower_components/highcharts/adapters/standalone-framework.js"></script>
+<script src="../bower_components/highcharts/highcharts.js"></script>
+
+<polymer-element name="event-tracker" attributes="event,chartTitle,mode">
+  <template>
+    <style>
+      /* styles for the custom element itself - lowest specificity */
+      :host { display: block; }
+      .card {
+        position: relative;
+        background: #FFFFFF;
+        padding: 10px;
+      }
+      #container{
+        position: relative;
+      }
+      #container:before{
+        content: "";
+        display: block;
+        padding-top: 50%;  /* initial ratio of 2:1*/
+      }
+      #linechart {
+        position:  absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      /*
+      style if an ancestor has the different class
+      :host-context(.different) { }
+      */
+    </style>
+    <div class="card">
+      <paper-shadow z="1"></paper-shadow>
+      <div id="container">
+        <div id="linechart"></div>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      observe: {
+        'event.event_id': 'eventChanged'
+      },
+
+      eventChanged: function eventTracker$eventChanged( oldValue, newValue ) {
+        if ( newValue !== '' ) {
+          this._initialize();
+        }
+      },
+      
+      _getHistoryData: function eventTracker$_getHistoryData() {
+        if ( this.mode === 'TicketCount' ) {
+          return this.event.num_ticket_trend;
+        }
+        else if ( this.mode === 'LowPrice' ) {
+          return this.event.low_price_trend;
+        }
+      },
+      
+      _getChartTitle: function eventTracker$_getChartTitle() {
+        if ( this.mode === 'TicketCount' ) {
+          return 'Total Listings';
+        }
+        else if ( this.mode === 'LowPrice' ) {
+          return 'Low Price';
+        }
+      },
+
+      _getValuePrefix: function eventTracker$_getValuePrefix() {
+        if ( this.mode === 'TicketCount' ) {
+          return '';
+        }
+        else if ( this.mode === 'LowPrice' ) {
+          return '$';
+        }
+      },
+
+      _getValueSuffix: function eventTracker$_getValueSuffix() {
+        if ( this.mode === 'TicketCount' ) {
+          return ' tickets';
+        }
+        else if ( this.mode === 'LowPrice' ) {
+          return '';
+        }
+      },
+
+      _getDecimalPlaces: function eventTracker$_getDecimalPlaces() {
+        if ( this.mode === 'TicketCount' ) {
+          return 0;
+        }
+        else if ( this.mode === 'LowPrice' ) {
+          return 2;
+        }
+      },
+
+      _initialize: function eventTracker$_initialize() {
+        var linechartContainer;
+        linechartContainer = this.shadowRoot.querySelector('#linechart');
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+        var chart = new Highcharts.Chart( {
+            chart: {
+              renderTo: linechartContainer,
+              style: {
+                fontFamily: '"RobotoDraft", "Helvetica Neue", Helvetica, Arial, sans-serif'
+              }
+            },
+            colors: [ '#607d8b' ],
+            credits: {
+              enabled: false
+            },
+            title: {
+                text: this._getChartTitle()
+            },
+            xAxis: {
+                type: 'datetime',
+                dateTimeLabelFormats:
+                {
+                  millisecond: '%l:%M %p',
+                  second: '%l:%M %p',
+                  minute: '%l:%M %p',
+                  hour: '%l:%M %p',
+                  day: '%e. %b',
+                  week: '%e. %b',
+                  month: '%b \'%y',
+                  year: '%Y'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: ''
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#90a4ae'
+                }] 
+            },
+            tooltip: {
+                valuePrefix: this._getValuePrefix(),
+                valueSuffix: this._getValueSuffix(),
+                valueDecimals: this._getDecimalPlaces(),
+                pointFormat: '<b>{point.y}</b><br/>',
+                dateTimeLabelFormats:
+                {
+                  millisecond: '%l:%M %p',
+                  second: '%l:%M %p',
+                  minute: '%l:%M %p',
+                  hour: '%l:%M %p',
+                  day: '%e. %b',
+                  week: '%e. %b',
+                  month: '%b \'%y',
+                  year: '%Y'
+                }
+            },
+            legend: {
+                enabled: false,
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: [
+              {
+                  data: this._getHistoryData()
+              }
+            ]
+        });
+        //debugger;
+        //chart.setSize( linechartContainer.clientWidth ,linechartContainer.clientHeight );
+      }
+    });
+  </script>
+</polymer-element>

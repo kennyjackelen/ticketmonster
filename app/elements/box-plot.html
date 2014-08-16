@@ -1,0 +1,196 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-elements/paper-elements.html">
+<link rel="import" href="../bower_components/core-elements/core-elements.html">
+<script src="../bower_components/highcharts/adapters/standalone-framework.js"></script>
+<script src="../bower_components/highcharts/highcharts.js"></script>
+<script src="../bower_components/highcharts/highcharts-more.js"></script>
+
+<polymer-element name="box-plot" attributes="event">
+  <template>
+    <style>
+      /* styles for the custom element itself - lowest specificity */
+      :host { display: block; }
+      .card {
+        position: relative;
+        background: #FFFFFF;
+        padding: 10px;
+      }
+      #container{
+        position: relative;
+        min-height: 200px;
+      }
+      #container:before{
+        content: "";
+        display: block;
+        padding-top: 25%;  /* initial ratio of 2:1*/
+      }
+      #inner {
+        position:  absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      #priceInput::shadow #inputCloneSpan:before {
+        content: "$";
+      }
+      /*
+      style if an ancestor has the different class
+      :host-context(.different) { }
+      */
+    </style>
+    <div class="card">
+    <paper-shadow z="1"></paper-shadow>
+      <div id="container">
+        <div id="inner" layout vertical>
+          <div>
+            <paper-input 
+              value="{{event.my_price}}"
+              id="priceInput"
+              floatingLabel
+              label="Your Price"
+              type="number" 
+              step="0.01"></paper-input>
+          </div>
+          <div flex id="boxplot"></div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      observe: {
+        'event.my_price': 'priceChanged',
+        'event.event_id': 'eventChanged'
+      },
+
+      eventChanged: function boxplot$eventChanged( oldValue, newValue ) {
+        if ( newValue !== '' ) {
+          this._initialize();
+        }
+      },
+
+      _getPriceData: function boxplot$_getPriceData( ) {
+        var pd = this.event.price_data;
+        return [ [ pd.min, pd.first_q, pd.median, pd.third_q, pd.max] ];
+        //return [ [54.15, 69.99, 107.88, 176.02, 377.19] ];
+      },
+      
+
+      _getMyPriceData: function boxplot$_getMyPriceData( price ) {
+        var fPrice;
+        fPrice = parseFloat( price );
+        if ( isNaN( fPrice ) ) {
+          return [ ];
+        }
+        return [ [ 0, fPrice ] ];
+      },
+
+      priceChanged: function boxplot$priceChanged( oldValue, newValue ) {
+        var priceData;
+        priceData = this._getMyPriceData( newValue );
+        if ( this._chart !== undefined ) {
+          this._chart.get('my_price').setData( priceData );  // second param = true to redraw
+        }
+        this._savePriceOnServer();
+      },
+
+      _savePriceOnServer: function boxplot$_savePriceOnServer() {
+        var request;
+        request = new XMLHttpRequest();
+        request.open('POST', '/api/save_user_price.php', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.onload = function() {
+          var eventToAdd;
+          self.adding_event = false;
+          if (request.status < 200 || request.status >= 400) {
+            // We reached our target server, but it returned an error
+            console.log( 'Request to save event price failed with status ' 
+                + request.status + '. Event ID: ' + self.new_listing_id );
+            self.adding_event = false;
+          }
+        };
+        request.onerror = function() {
+            console.log( 'Request to save event price. Event ID: ' + self.new_listing_id );
+            self.adding_event = false;
+        };
+        request.send( 'event_id=' + this.event.event_id + '&user_price=' + this.event.my_price );
+      },
+
+      _initialize: function boxplot$initialize() {
+        var boxplotContainer;
+
+        boxplotContainer = this.shadowRoot.querySelector('#boxplot');
+        this._chart = new Highcharts.Chart( {
+            chart: {
+              renderTo: boxplotContainer,
+              type: 'boxplot',
+              style: {
+                fontFamily: '"RobotoDraft", "Helvetica Neue", Helvetica, Arial, sans-serif'
+              },
+              inverted: true
+            },
+            colors: [ '#607d8b' ],
+            credits: {
+              enabled: false
+            },
+            
+            title: {
+              text: ''
+            },
+            
+            legend: {
+              enabled: false
+            },
+        
+            xAxis: {
+              categories: ['1'],
+              title: {
+                text: ''
+              },
+              labels: {
+                enabled: false
+              }
+            },
+            
+            yAxis: {
+              title: {
+                text: 'Ticket Prices ($)'
+              }
+            },
+        
+            series: [{
+              name: 'Ticket Prices',
+              data: this._getPriceData(),
+              tooltip: {
+                headerFormat: '',
+                valuePrefix: '$',
+                valueDecimals: 2
+              }
+            }, {
+              id: 'my_price',
+              name: 'My Price',
+              color: '#607d8b',
+              type: 'scatter',
+              data: this._getMyPriceData( this.event.my_price ),
+              marker: {
+                fillColor: 'white',
+                lineWidth: 1,
+                lineColor: '#607d8b'
+              },
+              tooltip: {
+                valueDecimals: 2,
+                valuePrefix: '$',
+                pointFormat: '{point.y}'
+              }
+            }]
+          });
+
+      },
+
+      domReady: function boxplot$domReady() {
+        CoreStyle.g.paperInput.focusedColor = '#607d8b';
+      }
+    });
+  </script>
+</polymer-element>

@@ -1,0 +1,74 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-shadow/paper-shadow.html">
+<link rel="import" href="../bower_components/core-elements/core-elements.html">
+
+<polymer-element name="event-summary" attributes="event">
+  <template>
+    <style>
+      /* styles for the custom element itself - lowest specificity */
+      :host { display: block; }
+      .card {
+        position: relative;
+        background: #FFFFFF;
+        padding: 10px;
+      }
+      #container{
+        position: relative;
+      }
+
+      @media (min-width: 1200px) {
+        #container:before{
+          content: "";
+          display: block;
+          padding-top: 25%;  /* initial ratio of 2:1*/
+        }
+        #container{
+          min-height: initial;
+          min-height: 200px;
+        }
+        #summary {
+          position:  absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
+        }
+      }
+      .title {
+        font-size: 28pt;
+        font-weight: bold;
+      }
+      .details {
+        font-weight: lighter;
+        color: #555555;
+        text-align: right;
+      }
+      /*
+      style if an ancestor has the different class
+      :host-context(.different) { }
+      */
+    </style>
+    <div class="card" id="card">
+      <paper-shadow z="1" id="cardShadow"></paper-shadow>
+      <div id="container">
+        <div id="summary" vertical layout>
+          <div class="title">{{ event.name }}</div>
+          <div flex></div>
+          <div class="details">
+            {{ event.date }}<br>
+            {{ event.venue_name }}<br>
+            {{ event.venue_city }}, {{ event.venue_state }}
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      domReady: function() {
+        var elByID = this.shadowRoot.getElementById.bind( this.shadowRoot );
+        elByID('cardShadow').target = elByID('card');
+      }
+    });
+  </script>
+</polymer-element>

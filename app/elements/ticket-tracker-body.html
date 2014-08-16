@@ -1,0 +1,81 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<polymer-element name="ticket-tracker-body" attributes="eventList" >
+  <template>
+    <style>
+      /* styles for the custom element itself - lowest specificity */
+      :host {
+        display: block;
+      }
+      event-tracker, box-plot, event-summary {
+        width: 96%;
+        padding: 2%;
+        padding-right: 0;
+        padding-bottom: 0;
+      }
+      @media (min-width: 1200px) {
+        box-plot {
+          float: left;
+          width: 47%;
+          padding: 2%;
+          padding-left: 26.5%;
+          padding-right: 0;
+          padding-bottom: 0;
+        }
+        box-plot,event-tracker,event-summary {
+          float: left;
+          width: 47%;
+          padding: 2%;
+          padding-right: 0;
+          padding-bottom: 0;
+        }   
+      }
+      .widget:last-child {
+        padding-bottom: 2%;
+      }
+      /*
+      style if an ancestor has the different class
+      :host-context(.different) { }
+      */
+    </style>
+    <flatiron-director
+          route="{{ route }}" 
+          autoHash
+          on-director-route="{{ routeChanged }}">
+    </flatiron-director>
+    <template if="{{ route | checkRoute( 'event', 0 ) }}">
+      <event-summary event="{{ selectedEvent }}" class="widget"></event-summary>
+      <box-plot event="{{ selectedEvent }}" class="widget"></box-plot>
+      <event-tracker event="{{ selectedEvent }}" mode="LowPrice" class="widget"></event-tracker>
+      <event-tracker event="{{ selectedEvent }}" mode="TicketCount" class="widget"></event-tracker>
+    </template>
+  </template>
+  <script>
+    Polymer({
+      eventListChanged: function() {
+        this.routeChanged();
+      },
+      routeChanged: function() {
+        var i;
+        var len;
+        var event_id;
+        event_id = this._eventID( this.route );
+        if ( this.eventList !== undefined ) {
+          len = this.eventList.length;
+          for ( i = 0; i < len; i++ ) {
+            if ( this.eventList[ i ].event_id === event_id ) {
+              this.selectedEvent = this.eventList[ i ];
+              return;
+            }
+          }
+        }
+      },
+      checkRoute: function( route, testValue, piece ) {
+        return ( route.split('~')[ piece ] === testValue );
+      },
+      _eventID: function( route ) {
+        return route.split('~')[ 1 ];
+      }
+    });
+  </script>
+</polymer-element>

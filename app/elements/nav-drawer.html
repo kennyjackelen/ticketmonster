@@ -1,0 +1,335 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-elements/paper-elements.html">
+<link rel="import" href="../bower_components/core-elements/core-elements.html">
+
+<polymer-element name="nav-drawer" attributes="eventList" >
+  <template>
+    <style>
+      /* styles for the custom element itself - lowest specificity */
+      :host {
+        display: block;
+        background-color: #FFFFFF;
+      }
+      core-header-panel {
+        height: 100%;
+      }
+      .list-item-container {
+        border-bottom: 1px solid #EEEEEE;
+      }
+      .list-item {
+        /*height: 93px;*/
+        height: 69px;
+        padding: 5px;
+      }
+      .list-title-toolbar{
+        color: #FFFFFF;
+        font-size: 14pt;
+        background-color: #455a64;
+        padding-top: 5px;
+        padding-bottom: 5px;     
+        padding: 8px;   
+      }
+      .list-title {
+        /*text-align: center;*/
+        line-height: 40px;
+      }
+      .list-item-title {
+        padding: 0;
+        margin: 0;
+        font-weight: bold;
+      }
+      .list-item-detail {
+        color: #333333;
+        font-weight: lighter;
+        padding: 0;
+        margin: 0;
+        font-size: 0.80em;
+      }
+      .list-item-buttons {
+        margin: 0;
+        padding: 0;
+      }
+      .selected {
+        background-color: #EEEEEE;
+      }
+      .nowrap {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      core-icon {
+        width: 24px;
+        height: 24px;
+        margin: 8px;
+      }
+      paper-fab {
+        /*margin-right: 8px;*/
+        background-color: #616161;
+      }
+      .list-empty-msg {
+        font-weight: lighter;
+        color: #555555;
+        text-align: center;
+      }
+      .adding-event-msg {
+        background-color: #263238;
+        color: #FFFFFF;
+        text-align: center;
+        padding: 8px;
+      }
+      /*
+      style if an ancestor has the different class
+      :host-context(.different) { }
+      */
+    </style>
+    <flatiron-director 
+          route="{{ route }}"
+          autoHash
+          on-director-route="{{ directorRoute }}"></flatiron-director>
+    <paper-shadow z="1"></paper-shadow>
+    <core-header-panel>
+      <div class="list-title-toolbar"
+           layout justified horizontal>
+        <div class="list-title" flex>Your Tickets</div>
+        <paper-fab class="mini"
+                   icon="add"
+                   on-click="{{ addItem }}"></paper-fab>
+      </div>
+      <template if="{{ adding_event }}">
+        <div class="adding-event-msg">Adding event...</div>
+      </template>
+      <template if="{{ eventList.length === 0 }}">
+        <div class="list-empty-msg">You are not monitoring any events.</div>
+      </template>
+      <template repeat="{{ eventList }}">
+        <div on-click="{{ itemSelected }}" 
+             layout horizontal 
+             class="list-item-container {{ { selected: selected } | tokenList }}">
+          <div flex class="list-item">
+            <p class="list-item-title nowrap">{{ name }}</p>
+            <p class="list-item-detail nowrap">{{ date }}</p>
+            <p class="list-item-detail nowrap">{{ venue_name }}</p>
+            <p class="list-item-detail nowrap">{{ venue_city }}, {{ venue_state }} </p>
+          </div>
+          <div>
+            <paper-icon-button
+              on-click="{{ removeItem }}"
+              icon="delete"></paper-icon-button>
+          </div>
+        </div>
+      </template>
+    </core-header-panel>
+    <paper-dialog id="addNew" heading="Monitor new listing" backdrop>
+      <paper-input value="{{ new_listing_id }}"
+                   label="Event ID" autofocus
+                   on-input="{{ newListingOnInput }}"></paper-input>
+      <paper-button label="Cancel" affirmative></paper-button>
+      <paper-button label="Add" 
+                    affirmative
+                    disabled?="{{ add_button_disabled }}"
+                    on-click="{{ reallyAddItem }}"></paper-button>
+    </paper-dialog>
+    <paper-dialog id="confirmRemove" heading="Are you sure?" backdrop>
+      <p>Are you sure you want to stop tracking {{ clickedDelete.name }}?</p>
+      <p>Ticket Monster will no longer monitor the price of this event if you delete it.</p>
+      <paper-button label="Keep It" affirmative></paper-button>
+      <paper-button label="Delete It" affirmative autofocus on-click="{{ reallyRemoveItem }}"></paper-button>
+    </paper-dialog>
+    <paper-dialog id="duplicateError" heading="Event already exists!" backdrop>
+      <p>{{ duplicate_event.name }} already exists. You cannot add it again.</p>
+      <paper-button label="OK" affirmative></paper-button>
+    </paper-dialog>
+    <paper-dialog id="serverError" heading="Error" backdrop>
+      <p>{{ errorMsg }}</p>
+      <paper-button label="Dismiss" affirmative autofocus></paper-button>
+    </paper-dialog>
+  </template>
+  <script>
+    Polymer({
+      eventListChanged: function() {
+        this.selected_event_id = '';
+        this._updateSelection();
+      },
+      directorRoute: function(e, detail, sender) {
+        if ( this._isEventRoute() ) {
+          this._updateSelection();
+        }
+      },
+      itemSelected: function(e, detail, sender) {
+        var event_id;
+        try {
+          event_id = sender.templateInstance.model.event_id;
+        }
+        catch (e) {
+          event_id = '';
+        }
+        this._updateSelection( event_id );
+        this.fire('item-selected');
+      },
+      newListingOnInput: function(e, detail, sender) {
+        this.add_button_disabled = ( e.target.inputValue === '' );
+      },
+      addItem: function(e, detail, sender) {
+        e.stopPropagation();
+        this.add_button_disabled = true;
+        this.new_listing_id = '';
+        this._addNewDialog.toggle();
+      },
+      reallyAddItem: function(e, detail, sender) {
+        var request;
+        var self = this;
+
+        if ( this.new_listing_id === '' ) {
+          // validation should prevent this, but just in case
+          return;
+        }
+        if ( this._checkDuplicates() ) {
+          this._duplicateDialog.toggle();
+          return;
+        }
+
+        this.adding_event = true;
+        request = new XMLHttpRequest();
+        request.open('POST', '/api/add_event.php', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.onload = function() {
+          var eventToAdd;
+          self.adding_event = false;
+          if (request.status >= 200 && request.status < 400) {
+            if ( request.responseText !== '') {
+              eventToAdd = JSON.parse(request.responseText);
+              if ( eventToAdd.error_msg !== undefined ) {
+                self.errorMsg = eventToAdd.error_msg;
+                self._serverErrorDialog.toggle();
+              }
+              else {
+                self.eventList.push( eventToAdd );
+              }
+            }
+            else {
+              // todo: error popup or something
+            }
+          }
+          else {
+            // We reached our target server, but it returned an error
+            console.log( 'Request to add event failed with status ' 
+                + request.status + '. Event ID: ' + self.new_listing_id );
+            self.adding_event = false;
+          }
+        };
+        request.onerror = function() {
+            console.log( 'Request to add event failed. Event ID: ' + self.new_listing_id );
+            self.adding_event = false;
+        };
+        request.send( 'event_id=' + this.new_listing_id );
+      },
+      _checkDuplicates: function() {
+        var len;
+        var i;
+        if ( this.eventList == undefined ) {
+          return;
+        }
+        len = this.eventList.length;
+        for ( i = 0; i < len; i++ ) {
+          if ( this.eventList[ i ].event_id === this.new_listing_id ) {
+            this.duplicate_event = this.eventList[ i ];
+            return true;
+          }
+        }
+        return false;
+      },
+      removeItem: function(e, detail, sender) {
+        // sender.templateInstance.model
+        e.stopPropagation();
+        this.clickedDelete = sender.templateInstance.model;
+        this._confirmRemoveDialog.toggle();
+      },
+      reallyRemoveItem: function(e, detail, sender) {
+        var i;
+        var len;
+        var event_id;
+
+        event_id = this.clickedDelete.event_id;
+
+        if ( this.eventList !== undefined ) {
+          len = this.eventList.length;
+          for ( i = 0; i < len; i++ ) {
+            if ( this.eventList[ i ].event_id === event_id ) {
+              this.eventList.splice( i, 1 );
+              break;
+            }
+          }
+        }
+
+        request = new XMLHttpRequest();
+        request.open('POST', '/api/delete_event.php', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.onload = function() {
+          if (request.status < 200 || request.status >= 400){
+            console.log( 'Request to delete event failed with status ' 
+                + request.status + '. Event ID: ' + event_id );
+          }
+        };
+        request.onerror = function() {
+            console.log( 'Request to delete event failed. Event ID: ' + event_id );
+        };
+        request.send( 'event_id=' + event_id );
+
+        if ( this.selected_event_id === event_id ) {
+          this.selected_event_id = '';
+          this.route = '';
+        }
+
+      },
+      domReady: function() {
+        this._confirmRemoveDialog = this.shadowRoot.querySelector('#confirmRemove');
+        this._addNewDialog = this.shadowRoot.querySelector('#addNew');
+        this._duplicateDialog = this.shadowRoot.querySelector('#duplicateError');
+        this._serverErrorDialog = this.shadowRoot.querySelector('#serverError');
+        this._addNewInput = this.shadowRoot.querySelector('#addNewInput');
+      },
+      _isEventRoute: function() {
+        return ( this.route.split('~')[ 0 ] === 'event' );
+      },
+      _eventID: function( route ) {
+        var returnValue;
+        try {
+          returnValue = route.split('~')[ 1 ];
+        }
+        catch (e) {
+          returnValue = '';
+        }
+        if ( returnValue === undefined ) {
+          returnValue = '';
+        }
+        return returnValue;
+      },
+      _updateSelection: function( event_id ) {
+        var i;
+        var len;
+        if ( event_id === undefined ) {
+          event_id = this._eventID( this.route );
+        }
+        if ( event_id === '' ) {
+          return;
+        }
+        if ( this.selected_event_id === event_id ) {
+          return;
+        }
+        this.selected_event_id = event_id;
+        this.route = 'event~' + event_id;
+        if ( this.eventList !== undefined ) {
+          len = this.eventList.length;
+          for ( i = 0; i < len; i++ ) {
+            if ( this.eventList[ i ].event_id === event_id ) {
+              this.eventList[ i ].selected = true;
+            }
+            else {
+              this.eventList[ i ].selected = false;
+            }
+          }
+        }
+      }
+    });
+  </script>
+</polymer-element>
