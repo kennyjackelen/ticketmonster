@@ -33,6 +33,13 @@
       .widget:last-child {
         padding-bottom: 2%;
       }
+      .message {
+        color: #37474f;
+        width: 96%;
+        padding: 2%;
+        padding-right: 0;
+        padding-bottom: 0;
+      }
       /*
       style if an ancestor has the different class
       :host-context(.different) { }
@@ -48,6 +55,12 @@
       <box-plot event="{{ selectedEvent }}" class="widget"></box-plot>
       <event-tracker event="{{ selectedEvent }}" mode="LowPrice" class="widget"></event-tracker>
       <event-tracker event="{{ selectedEvent }}" mode="TicketCount" class="widget"></event-tracker>
+    </template>
+    <template if="{{ route | checkRouteNot( 'event', 0 ) }}">
+      <div class="message">
+        <h3>No event selected</h3>
+        Select an event from the list on the left, or add a new event to track.
+      </div>
     </template>
   </template>
   <script>
@@ -69,6 +82,9 @@
             }
           }
         }
+      },
+      checkRouteNot: function( route, testValue, piece ) {
+        return !this.checkRoute( route, testValue, piece );
       },
       checkRoute: function( route, testValue, piece ) {
         return ( route.split('~')[ piece ] === testValue );

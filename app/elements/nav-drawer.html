@@ -66,16 +66,24 @@
         /*margin-right: 8px;*/
         background-color: #616161;
       }
+      .helptext {
+        font-weight: lighter;
+        color: #555555;
+      }
       .list-empty-msg {
         font-weight: lighter;
         color: #555555;
         text-align: center;
+        padding: 8px;
       }
       .adding-event-msg {
         background-color: #263238;
         color: #FFFFFF;
         text-align: center;
         padding: 8px;
+      }
+      #addNewID {
+        width: 16em;
       }
       /*
       style if an ancestor has the different class
@@ -99,7 +107,7 @@
         <div class="adding-event-msg">Adding event...</div>
       </template>
       <template if="{{ eventList.length === 0 }}">
-        <div class="list-empty-msg">You are not monitoring any events.</div>
+        <div class="list-empty-msg">You have not added any events.</div>
       </template>
       <template repeat="{{ eventList }}">
         <div on-click="{{ itemSelected }}" 
@@ -121,8 +129,10 @@
     </core-header-panel>
     <paper-dialog id="addNew" heading="Monitor new listing" backdrop>
       <paper-input value="{{ new_listing_id }}"
+                   id="addNewID"
                    label="Event ID" autofocus
                    on-input="{{ newListingOnInput }}"></paper-input>
+      <p class="helptext">This is a 16-digit ID that can be found in the Ticketmaster URL.</p>
       <paper-button label="Cancel" affirmative></paper-button>
       <paper-button label="Add" 
                     affirmative
