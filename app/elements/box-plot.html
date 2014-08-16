@@ -98,7 +98,7 @@
       _savePriceOnServer: function boxplot$_savePriceOnServer() {
         var request;
         request = new XMLHttpRequest();
-        request.open('POST', '/api/save_user_price.php', true);
+        request.open('POST', 'api/save_user_price.php', true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         request.onload = function() {
           var eventToAdd;

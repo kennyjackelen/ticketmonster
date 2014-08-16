@@ -190,7 +190,7 @@
 
         this.adding_event = true;
         request = new XMLHttpRequest();
-        request.open('POST', '/api/add_event.php', true);
+        request.open('POST', 'api/add_event.php', true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         request.onload = function() {
           var eventToAdd;
@@ -262,7 +262,7 @@
         }
 
         request = new XMLHttpRequest();
-        request.open('POST', '/api/delete_event.php', true);
+        request.open('POST', 'api/delete_event.php', true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
         request.onload = function() {
           if (request.status < 200 || request.status >= 400){
