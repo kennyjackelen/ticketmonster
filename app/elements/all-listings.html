@@ -84,6 +84,24 @@
   </template>
   <script>
     Polymer({
+      observe: {
+        'event.my_price': 'priceChanged',
+        'event.event_id': 'eventChanged'
+      },
+
+      eventChanged: function allListings$eventChanged( oldValue, newValue ) {
+        if ( newValue !== '' ) {
+          if ( this._listingsArchive[ newValue ] !== undefined ) {
+            this._initialize();
+            this.dataLoaded = true;
+            this.listings = this._listingsArchive[ newValue ];
+          }
+          else {
+            this._initialize();
+          }
+        }
+      },
+
       cheaperThanMine: function allListings$cheaperThanMine( value ) {
         if ( value.price < value.my_price ) {
           return 'cheap';
@@ -93,6 +111,7 @@
       loadListings: function allListings$loadListings() {
         var request;
         var self = this;
+        var event_id = this.event.event_id;
         if ( this.dataLoading ) {
           return;
         }
@@ -109,6 +128,7 @@
           }
           else {
             self.listings = resaleData.listings;
+            self._listingsArchive[ event_id ] = resaleData.listings;
           }
           self.dataLoaded = true;
           self.dataLoading = false;
@@ -123,6 +143,10 @@
         return '$' + value.toFixed(2);
       }, 
       ready: function() {
+        this._listingsArchive = {};
+        this._initialize();
+      },
+      _initialize: function allListings$_initialize() {
         this.dataLoaded = false;
         this.dataLoading = false;
         this.load_msg = 'Click to load listings...';
