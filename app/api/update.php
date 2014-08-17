@@ -30,7 +30,7 @@ foreach ( $events as $event )
   $resale_data = getResaleData( $event_id );
 
   if ( resaleInvalid( $resale_data ) ) {
-    $event->expired = true;
+    //$event->expired = true;
     continue;
   }
 
