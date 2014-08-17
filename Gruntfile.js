@@ -198,7 +198,15 @@ module.exports = function (grunt) {
           ]
         }]
       }
-    }
+    },
+    chmod: {
+      options: {
+        mode: '755'
+      },
+      yourTarget1: {
+        src: ['dist/api/update.php']
+      }
+  }
   });
 
   grunt.registerTask('server', function (target) {
@@ -229,6 +237,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean:dist',
     'copy',
+    'chmod',
     'vulcanize',
     'useminPrepare',
     'imagemin',
