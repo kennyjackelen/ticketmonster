@@ -4,10 +4,7 @@ include '_common.php';
 
 $event_id = $_POST['event_id'];
 
-$cookie = getTicketmasterCookie();
-
-$resale_url = resaleURL( $event_id );
-$resale_data = getJSON( $resale_url, $cookie );
+$resale_data = getResaleData( $event_id );
 
 if ( resaleInvalid( $resale_data ) )
 {

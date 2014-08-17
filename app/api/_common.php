@@ -4,16 +4,36 @@ define('EVENT_FILE', '../../data/events.json');
 define('MAX_RETRIES', 5000);
 
 function getTicketmasterCookie() {
+  return getCookie('http://www.ticketmaster.com/');
+}
+
+function getLiveNationCookie() {
+  return getCookie('http://concerts.livenation.com/');
+}
+
+function getCookie( $url ) {
 
   /* STEP 1. let’s create a cookie file */
   $ckfile = tempnam('/tmp', 'CURLCOOKIE');
   /* STEP 2. visit the homepage to set the cookie properly */
-  $ch = curl_init('http://www.ticketmaster.com/');
+  $ch = curl_init( $url );
   curl_setopt( $ch, CURLOPT_COOKIEJAR, $ckfile ); 
   curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
   $output = curl_exec( $ch );
 
   return $ckfile;
+
+}
+
+function getResaleData( $event_id ) {
+  $cookie = getTicketmasterCookie();
+  $resale_data = getJSON( resaleURL( $event_id ), $cookie );
+  if ( resaleInvalid( $resale_data ) )
+  {
+    $cookie = getLiveNationCookie();
+    $resale_data = getJSON( lnResaleURL( $event_id ), $cookie );
+  }
+  return $resale_data;
 }
 
 function getJSON( $url, $cookie ) {
@@ -121,6 +141,10 @@ function eventURL( $event_id ) {
 
 function resaleURL( $event_id ) {
   return 'http://www.ticketmaster.com/json/resale?command=get_resale_listings&event_id=' . $event_id;
+}
+
+function lnResaleURL( $event_id ) {
+  return 'http://concerts.livenation.com/json/resale?command=get_resale_listings&event_id=' . $event_id;
 }
 
 function openFile() {

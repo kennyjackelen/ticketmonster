@@ -27,8 +27,7 @@ foreach ( $events as $event )
 
   $event_id = $event->event_id;
 
-  $resale_url = resaleURL( $event_id );
-  $resale_data = getJSON( $resale_url, $cookie );
+  $resale_data = getResaleData( $event_id );
 
   if ( resaleInvalid( $resale_data ) ) {
     $event->expired = true;

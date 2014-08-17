@@ -15,8 +15,7 @@ if ( eventInvalid( $event_data ) )
     return;
 }
 
-$resale_url = resaleURL( $event_id );
-$resale_data = getJSON( $resale_url, $cookie );
+$resale_data = getResaleData( $event_id );
 
 if ( resaleInvalid( $resale_data ) )
 {
