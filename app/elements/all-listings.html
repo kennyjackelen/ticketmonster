@@ -1,0 +1,108 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<polymer-element name="all-listings"  attributes="event">
+  <template>
+    <style>
+      /* styles for the custom element itself - lowest specificity */
+      :host { display: block; }
+      .card {
+        position: relative;
+        background: #FFFFFF;
+      }
+      .content {
+        padding: 10px;
+      }
+      .clickToLoad {
+        cursor: pointer;
+      }
+      table {
+        width: 100%;
+        text-align: center;
+      }
+      .cheap {
+        color: #b0120a;
+      }
+      /*
+      style if an ancestor has the different class
+      :host-context(.different) { }
+      */
+    </style>
+    <div class="card" id="card">
+      <paper-shadow z="1" id="cardShadow"></paper-shadow>
+      <core-toolbar><div flex>Listings</div></core-toolbar>
+      <div class="content">
+        <template if="{{ !dataLoaded }}">
+          <span class="clickToLoad" on-click="{{ loadListings }}">
+            {{ load_msg }}
+          </span>
+        </template>
+        <template if="{{ dataLoaded && error_msg !== '' }}">
+          {{ error_msg }}
+        </template>
+        <template if="{{ dataLoaded && error_msg === '' && listings.length === 0 }}">
+          None...
+        </template>
+        <template if="{{ dataLoaded && listings.length > 0 }}">
+          <table>
+            <tr>
+              <th>Price</th>
+              <th>Section</th>
+              <th>Row</th>
+              <th>Quantity</th>
+            </tr>
+            <tr template repeat="{{ listing in listings }}"
+                class="{{ {price: listing.price, my_price: event.my_price } | cheaperThanMine }}">
+              <td>{{ listing.price | formatCurrency }}</td>
+              <td>Section {{ listing.section }}</td>
+              <td>Row {{ listing.row }}</td>
+              <td>{{ listing.qtyAvailable }}</td>
+            </tr>
+          </table>
+        </template>
+      </div>
+    </div>
+  </template>
+  <script>
+    Polymer({
+      cheaperThanMine: function allListings$cheaperThanMine( value ) {
+        if ( value.price < value.my_price ) {
+          return 'cheap';
+        }
+        return '';
+      },
+      loadListings: function allListings$loadListings() {
+        var request;
+        var self = this;
+        this.load_msg = 'Loading listings...';
+        request = new XMLHttpRequest();
+        request.open('POST', 'api/load_all_listings.php', true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+        request.onload = function() {
+          var resaleData;
+          resaleData = JSON.parse( request.responseText );
+          if ( resaleData.error_msg !== undefined ) {
+            self.error_msg = resaleData.error_msg;
+          }
+          else {
+            self.listings = resaleData.listings;
+          }
+          self.dataLoaded = true;
+        };
+        request.onerror = function() {
+          self.error_msg = 'An error occurred while loading listings for this event.';
+          self.dataLoaded = true;
+        };
+        request.send( 'event_id=' + this.event.event_id );
+      },
+      formatCurrency: function allListings$formatCurrency( value ) {
+        return '$' + value.toFixed(2);
+      }, 
+      ready: function() {
+        this.dataLoaded = false;
+        this.load_msg = 'Click to load listings...';
+        this.error_msg = '';
+        this.listings = [];
+      }
+    });
+  </script>
+</polymer-element>
