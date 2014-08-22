@@ -111,7 +111,28 @@
                 fontFamily: '"RobotoDraft", "Helvetica Neue", Helvetica, Arial, sans-serif'
               },
               pinchType: 'x',
-              zoomType: 'x'
+              zoomType: 'x',
+              resetZoomButton: {
+                position: {
+                  x: -1,
+                  y: 1
+                },
+                relativeTo: 'chart',
+                theme: {
+                  fill: '#FFFFFF',
+                  stroke: '#000000',
+                  r: 0,
+                  states: {
+                    hover: {
+                      fill: '#607d8b',
+                      stroke: '#607d8b',
+                      style: {
+                        color: 'white'
+                      }
+                    }
+                  }
+                }
+              }
             },
             colors: [ '#607d8b' ],
             credits: {
