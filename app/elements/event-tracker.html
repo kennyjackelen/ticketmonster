@@ -20,6 +20,14 @@
         display: block;
         padding-top: 50%;  /* initial ratio of 2:1*/
       }
+      #resetZoomBtn {
+        position: absolute;
+        background: #cfd8dc;
+        right: 10px;
+        top: 0;
+        font-size: 0.85em;
+        display: none;
+      }
       #linechart {
         position:  absolute;
         top: 0;
@@ -36,6 +44,10 @@
       <paper-shadow z="1"></paper-shadow>
       <div id="container">
         <div id="linechart"></div>
+        <paper-button id="resetZoomBtn"
+                      on-click="{{ resetZoom }}"
+                      label="Reset Zoom"
+                      raisedButton></paper-button>
       </div>
     </div>
   </template>
@@ -96,6 +108,19 @@
         }
       },
 
+      _showResetZoom: function eventTracker$_showResetZoom() {
+        this.$.resetZoomBtn.style.display = 'block';
+      },
+
+      _hideResetZoom: function eventTracker$_hideResetZoom() {
+        this.$.resetZoomBtn.style.display = 'none';
+      },
+
+      resetZoom: function eventTracker$resetZoom() {
+        this._chart.xAxis[0].setExtremes( null, null );
+        this._hideResetZoom();
+      },
+
       _initialize: function eventTracker$_initialize() {
         var linechartContainer;
         linechartContainer = this.shadowRoot.querySelector('#linechart');
@@ -104,8 +129,11 @@
                 useUTC: false
             }
         });
-        var chart = new Highcharts.Chart( {
+        this._chart = new Highcharts.Chart( {
             chart: {
+              events: {
+                selection: this._showResetZoom.bind( this )
+              },
               renderTo: linechartContainer,
               style: {
                 fontFamily: '"RobotoDraft", "Helvetica Neue", Helvetica, Arial, sans-serif'
@@ -113,23 +141,9 @@
               pinchType: 'x',
               zoomType: 'x',
               resetZoomButton: {
-                position: {
-                  x: -1,
-                  y: 1
-                },
-                relativeTo: 'chart',
                 theme: {
-                  fill: '#FFFFFF',
-                  stroke: '#000000',
-                  r: 0,
-                  states: {
-                    hover: {
-                      fill: '#607d8b',
-                      stroke: '#607d8b',
-                      style: {
-                        color: 'white'
-                      }
-                    }
+                  style: {
+                    display: 'none'
                   }
                 }
               }
