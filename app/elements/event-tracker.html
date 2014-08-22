@@ -109,7 +109,9 @@
               renderTo: linechartContainer,
               style: {
                 fontFamily: '"RobotoDraft", "Helvetica Neue", Helvetica, Arial, sans-serif'
-              }
+              },
+              pinchType: 'x',
+              zoomType: 'x'
             },
             colors: [ '#607d8b' ],
             credits: {
@@ -168,6 +170,10 @@
             },
             series: [
               {
+                  marker:
+                  {
+                    radius: 2
+                  },
                   data: this._getHistoryData()
               }
             ]
