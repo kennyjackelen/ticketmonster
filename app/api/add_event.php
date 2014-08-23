@@ -25,6 +25,10 @@ if ( resaleInvalid( $resale_data ) )
 }
 
 $rightNow = time() * 1000;
+
+$cur_avg_price = array( $rightNow, $resale_data->summary->medianPrice->amount );
+$avg_price_trend = array( $cur_avg_price );
+
 $cur_low_price = array( $rightNow, $resale_data->summary->minDisplayPrice->amount );
 $low_price_trend = array( $cur_low_price );
 

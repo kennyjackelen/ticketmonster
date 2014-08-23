@@ -35,6 +35,13 @@ foreach ( $events as $event )
   }
 
   $rightNow = time() * 1000;
+
+  $cur_avg_price = array( $rightNow, $resale_data->summary->medianPrice->amount );
+  if ( !is_array( $event->avg_price_trend ) ) {
+    $event->avg_price_trend = array();
+  }
+  array_push( $event->avg_price_trend, $cur_avg_price );
+
   $cur_low_price = array( $rightNow, $resale_data->summary->minDisplayPrice->amount );
   if ( !is_array( $event->low_price_trend ) ) {
     $event->low_price_trend = array();
