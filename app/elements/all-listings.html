@@ -71,8 +71,8 @@
               <th>Quantity</th>
             </tr>
             <tr template repeat="{{ listing in listings }}"
-                class="{{ {price: listing.price, my_price: event.my_price } | cheaperThanMine }}">
-              <td>{{ listing.price | formatCurrency }}</td>
+                class="{{ { cheap: listing.total < event.my_price } | tokenList }}">
+              <td>{{ listing.total | formatCurrency }}</td>
               <td>Section {{ listing.section }}</td>
               <td>Row {{ listing.row }}</td>
               <td>{{ listing.qtyAvailable }}</td>
@@ -101,13 +101,7 @@
           }
         }
       },
-
-      cheaperThanMine: function allListings$cheaperThanMine( value ) {
-        if ( value.price < value.my_price ) {
-          return 'cheap';
-        }
-        return '';
-      },
+      
       loadListings: function allListings$loadListings() {
         var request;
         var self = this;
