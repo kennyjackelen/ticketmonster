@@ -8,9 +8,7 @@
       /* styles for the custom element itself - lowest specificity */
       :host { display: block; }
       .card {
-        border-radius: 2px;
         position: relative;
-        background: #FFFFFF;
         padding: 10px;
       }
       #container{
@@ -41,6 +39,7 @@
       :host-context(.different) { }
       */
     </style>
+    <core-style ref="card"></core-style>
     <div class="card">
       <paper-shadow z="1"></paper-shadow>
       <div id="container">
