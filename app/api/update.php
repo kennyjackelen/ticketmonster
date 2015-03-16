@@ -17,6 +17,7 @@ if ( !$handle )
 }
 
 $cookie = getTicketmasterCookie();
+sleep( REQUEST_THROTTLE );
 
 $events = getEvents();
 foreach ( $events as $event )
@@ -28,6 +29,7 @@ foreach ( $events as $event )
   $event_id = $event->event_id;
 
   $resale_data = getResaleData( $event_id );
+  sleep( REQUEST_THROTTLE );  // throttle requests when updating in background
 
   if ( resaleInvalid( $resale_data ) ) {
     //$event->expired = true;

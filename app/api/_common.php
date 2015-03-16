@@ -2,6 +2,7 @@
 
 define('EVENT_FILE', '../../data/events.json');
 define('MAX_RETRIES', 5000);
+define('REQUEST_THROTTLE', 1);  // defined in seconds
 
 function getTicketmasterCookie() {
   return getCookie('http://www.ticketmaster.com/');
