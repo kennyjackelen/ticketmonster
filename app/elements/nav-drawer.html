@@ -2,8 +2,10 @@
 <link rel="import" href="../bower_components/paper-elements/paper-elements.html">
 <link rel="import" href="../bower_components/core-elements/core-elements.html">
 
+
 <polymer-element name="nav-drawer" attributes="eventList" >
   <template>
+    <link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.min.css">
     <style>
       /* styles for the custom element itself - lowest specificity */
       :host {
@@ -65,6 +67,9 @@
         height: 24px;
         margin: 8px;
       }
+      .lowball-alert {
+        color: maroon;
+      }
       paper-fab {
         /*margin-right: 8px;*/
         background-color: #616161;
@@ -117,7 +122,12 @@
              layout horizontal 
              class="list-item-container {{ { selected: selected } | tokenList }}">
           <div flex class="list-item">
-            <p class="list-item-title nowrap">{{ name }}</p>
+            <p class="list-item-title nowrap">
+              <template if="{{ lowballed }}">
+                <i class="fa fa-exclamation lowball-alert"></i>
+              </template>
+              {{ name }}
+            </p>
             <p class="list-item-detail nowrap">{{ date }}</p>
             <p class="list-item-detail nowrap">{{ venue_name }}</p>
             <p class="list-item-detail nowrap">{{ venue_city }}, {{ venue_state }} </p>
@@ -163,6 +173,14 @@
       eventListChanged: function() {
         this.selected_event_id = '';
         this._updateSelection();
+        for ( var i = 0; i < this.eventList.length; i++ ) {
+          var thisEvent = this.eventList[ i ];
+          var lowPriceMax = thisEvent.low_price_trend.length - 1;
+          var lowPrice = thisEvent.low_price_trend[ lowPriceMax ][ 1 ];
+          if ( lowPrice < thisEvent.my_price ) {
+            thisEvent.lowballed = true;
+          }
+        }
       },
       directorRoute: function(e, detail, sender) {
         if ( this._isEventRoute() ) {

@@ -7,7 +7,8 @@
     "flatiron-director": "polymer/flatiron-director",
     "highcharts": "~4.0.3",
     "jquery": "~2.1.1",
-    "paper-elements": "polymer/paper-elements"
+    "paper-elements": "polymer/paper-elements",
+    "font-awesome": "~4.3.0"
   },
   "devDependencies": {}
 }
