@@ -39,8 +39,7 @@
       */
     </style>
     <core-style ref="card"></core-style>
-    <div class="card">
-    <paper-shadow z="1"></paper-shadow>
+    <paper-shadow z="1" id="shadow-wrapper" class="card">
       <div id="container">
         <div id="inner" layout vertical>
           <div>
@@ -55,7 +54,7 @@
           <div flex id="boxplot"></div>
         </div>
       </div>
-    </div>
+    </paper-shadow>
   </template>
   <script>
     Polymer({

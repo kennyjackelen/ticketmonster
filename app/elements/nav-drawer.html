@@ -10,6 +10,9 @@
         display: block;
         background-color: #FFFFFF;
       }
+      #shadow-wrapper {
+        height: 100%;
+      }
       core-header-panel {
         height: 100%;
       }
@@ -94,12 +97,12 @@
           route="{{ route }}"
           autoHash
           on-director-route="{{ directorRoute }}"></flatiron-director>
-    <paper-shadow z="1"></paper-shadow>
+    <paper-shadow z="1" id="shadow-wrapper">
     <core-header-panel>
       <div class="list-title-toolbar"
            layout justified horizontal>
         <div class="list-title" flex>Your Tickets</div>
-        <paper-fab class="mini"
+        <paper-fab mini
                    icon="add"
                    on-click="{{ addItem }}"></paper-fab>
       </div>
@@ -127,6 +130,7 @@
         </div>
       </template>
     </core-header-panel>
+    </paper-shadow>
     <paper-dialog id="addNew" heading="Monitor new listing" backdrop>
       <paper-input value="{{ new_listing_id }}"
                    id="addNewID"
