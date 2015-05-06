@@ -79,6 +79,9 @@ module.exports = function (grunt) {
         options: {
           middleware: function (connect) {
             return [
+              gateway(__dirname + '/dist', {
+                '.php': 'php-cgi'
+              }),
               mountFolder(connect, yeomanConfig.dist)
             ];
           }

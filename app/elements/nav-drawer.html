@@ -2,10 +2,9 @@
 <link rel="import" href="../bower_components/paper-elements/paper-elements.html">
 <link rel="import" href="../bower_components/core-elements/core-elements.html">
 
-
 <polymer-element name="nav-drawer" attributes="eventList" >
   <template>
-    <link rel="stylesheet" href="../bower_components/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <style>
       /* styles for the custom element itself - lowest specificity */
       :host {
@@ -181,6 +180,9 @@
             thisEvent.lowballed = true;
           }
         }
+        this.eventList.sort( function(a,b) {
+          return ( new Date(a.date) - new Date(b.date) );
+        })
       },
       directorRoute: function(e, detail, sender) {
         if ( this._isEventRoute() ) {
