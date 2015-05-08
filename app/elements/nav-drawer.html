@@ -140,32 +140,31 @@
       </template>
     </core-header-panel>
     </paper-shadow>
-    <paper-dialog id="addNew" heading="Monitor new listing" backdrop>
+    <paper-action-dialog id="addNew" heading="Monitor new listing" backdrop>
       <paper-input value="{{ new_listing_id }}"
                    id="addNewID"
                    label="Event ID" autofocus
                    on-input="{{ newListingOnInput }}"></paper-input>
       <p class="helptext">This is a 16-digit ID that can be found in the Ticketmaster URL.</p>
-      <paper-button label="Cancel" affirmative></paper-button>
-      <paper-button label="Add" 
-                    affirmative
+      <paper-button affirmative>Cancel</paper-button>
+      <paper-button affirmative
                     disabled?="{{ add_button_disabled }}"
-                    on-click="{{ reallyAddItem }}"></paper-button>
-    </paper-dialog>
-    <paper-dialog id="confirmRemove" heading="Are you sure?" backdrop>
+                    on-click="{{ reallyAddItem }}">Add</paper-button>
+    </paper-action-dialog>
+    <paper-action-dialog id="confirmRemove" heading="Are you sure?" backdrop>
       <p>Are you sure you want to stop tracking {{ clickedDelete.name }}?</p>
       <p>Ticket Monster will no longer monitor the price of this event if you delete it.</p>
-      <paper-button label="Keep It" affirmative></paper-button>
-      <paper-button label="Delete It" affirmative autofocus on-click="{{ reallyRemoveItem }}"></paper-button>
-    </paper-dialog>
-    <paper-dialog id="duplicateError" heading="Event already exists!" backdrop>
+      <paper-button affirmative>Keep It</paper-button>
+      <paper-button affirmative autofocus on-click="{{ reallyRemoveItem }}">Delete It</paper-button>
+    </paper-action-dialog>
+    <paper-action-dialog id="duplicateError" heading="Event already exists!" backdrop>
       <p>{{ duplicate_event.name }} already exists. You cannot add it again.</p>
-      <paper-button label="OK" affirmative></paper-button>
-    </paper-dialog>
-    <paper-dialog id="serverError" heading="Error" backdrop>
+      <paper-button affirmative>OK</paper-button>
+    </paper-action-dialog>
+    <paper-action-dialog id="serverError" heading="Error" backdrop>
       <p>{{ errorMsg }}</p>
-      <paper-button label="Dismiss" affirmative autofocus></paper-button>
-    </paper-dialog>
+      <paper-button affirmative autofocus>Dismiss</paper-button>
+    </paper-action-dialog>
   </template>
   <script>
     Polymer({
