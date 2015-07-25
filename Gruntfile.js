@@ -209,7 +209,24 @@ module.exports = function (grunt) {
       yourTarget1: {
         src: ['dist/api/update.php']
       }
-  }
+    },
+    cacheBust: {
+      options: {
+        ignorePatterns: [
+          'bower_components'
+        ],
+        filters: {
+          'link[rel="import"]': function() {
+            return this.attribs.href;
+          },
+        },
+      },
+      assets: {
+        files: {
+          src: ['<%= yeoman.dist %>/index.html']
+        }
+      }
+    }
   });
 
   grunt.registerTask('server', function (target) {
@@ -249,6 +266,7 @@ module.exports = function (grunt) {
     'uglify',
     'htmlmin',
     'usemin',
+    'cacheBust',
     'clean:tmp'
   ]);
 
