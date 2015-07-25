@@ -179,9 +179,15 @@
             thisEvent.lowballed = true;
           }
         }
-        this.eventList.sort( function(a,b) {
-          return ( new Date(a.date) - new Date(b.date) );
-        })
+        if ( !this._justSorted ) {
+          this.eventList.sort( function(a,b) {
+            return ( new Date(a.date) - new Date(b.date) );
+          })
+          this._justSorted = true;
+        }
+        else {
+          this._justSorted = false;
+        }
       },
       directorRoute: function(e, detail, sender) {
         if ( this._isEventRoute() ) {
